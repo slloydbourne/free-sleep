@@ -9,6 +9,13 @@ import config from '../config.js';
 const defaultSideSettings: SideSettings = {
   name: 'Side',
   awayMode: false,
+  sleepStageTemperatures: {
+    enabled: false,
+    awake: 85,
+    light: 82,
+    deep: 78,
+    rem: 82,
+  },
   scheduleOverrides: {
     temperatureSchedules: {
       disabled: false,
@@ -56,6 +63,8 @@ const defaultData: Settings = {
   primePodDaily: {
     enabled: false,
     time: '14:00',
+    frequency: 'daily',
+    dayOfMonth: 1,
   },
 };
 

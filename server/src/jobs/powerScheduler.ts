@@ -4,6 +4,7 @@ import { DailySchedule, DayOfWeek, Side } from '../db/schedulesSchema.js';
 import { updateDeviceStatus } from '../routes/deviceStatus/updateDeviceStatus.js';
 import { getDayIndexForSchedule, getDayOfWeekIndex, logJob } from './utils.js';
 import { executeAnalyzeSleep } from './analyzeSleep.js';
+import { executeClassifyStages } from './classifyStages.js';
 import { TimeZone } from '../db/timeZones.js';
 import moment from 'moment-timezone';
 import serverStatus from '../serverStatus.js';
@@ -81,7 +82,13 @@ const scheduleAnalyzeSleep = (dayOfWeekIndex: number, offHour: number, offMinute
 
     logJob('Executing daily sleep analyzer job', side, day, dayOfWeekIndex, time);
     // Subtract a fixed start time
-    executeAnalyzeSleep(side, moment().subtract(12, 'hours').toISOString(), moment().add(1, 'hours').toISOString());
+    const stageWindowStart = moment().subtract(12, 'hours').toISOString();
+    const stageWindowEnd = moment().add(1, 'hours').toISOString();
+    // Stage classification reads the movement data analyzeSleep computes, so it
+    // must wait for analyzeSleep to actually finish, not just be spawned
+    await executeAnalyzeSleep(side, stageWindowStart, stageWindowEnd);
+    // Crude first-pass heuristic, see stage_classifier.py for caveats
+    executeClassifyStages(side, stageWindowStart, stageWindowEnd);
   });
 };
 

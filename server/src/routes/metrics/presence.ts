@@ -94,4 +94,7 @@ router.get('/presence', (req: Request, res: Response) => {
   return res.status(200).json(presenceData);
 });
 
+// Lets other server code (e.g. jobs) read live presence without an HTTP round-trip
+export const getPresence = (side: 'left' | 'right'): PresenceSide => presenceData[side];
+
 export default router;

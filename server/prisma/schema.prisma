@@ -48,3 +48,16 @@ model movement {
 }
 
 
+// Crude sleep-stage classification (awake/light/deep/rem) - see
+// biometrics/sleep_detection/stage_classifier.py. One row per vitals bucket.
+model sleep_stages {
+  id        Int    @id @default(autoincrement())
+  side      String
+  timestamp Int
+  stage     String // 'awake' | 'light' | 'deep' | 'rem'
+
+  @@unique([side, timestamp])
+  @@index([side, timestamp])
+}
+
+

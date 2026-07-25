@@ -16,10 +16,11 @@ type PrimePodScheduleProps = {
 export default function DailyPriming({ settings, updateSettings }: PrimePodScheduleProps) {
   const { isUpdating } = useAppStore();
   const theme = useTheme();
+  const isMonthly = settings?.primePodDaily?.frequency === 'monthly';
 
   return (
     <>
-      <Box sx={ { display: 'flex', alignItems: 'center', gap: 2, mb: 1 } }>
+      <Box sx={ { display: 'flex', alignItems: 'center', gap: 2, mb: 1, flexWrap: 'wrap' } }>
         <FormControlLabel
           control={
             <Switch
@@ -28,7 +29,17 @@ export default function DailyPriming({ settings, updateSettings }: PrimePodSched
               onChange={ (event) => updateSettings({ primePodDaily: { enabled: event.target.checked } }) }
             />
           }
-          label="Prime daily?"
+          label="Prime pod?"
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              disabled={ isUpdating || settings?.primePodDaily?.enabled === false }
+              checked={ isMonthly }
+              onChange={ (event) => updateSettings({ primePodDaily: { frequency: event.target.checked ? 'monthly' : 'daily' } }) }
+            />
+          }
+          label="Monthly instead of daily"
         />
         <TextField
           label="Prime time"
@@ -54,6 +65,22 @@ export default function DailyPriming({ settings, updateSettings }: PrimePodSched
             ),
           } }
         />
+        { isMonthly && (
+          <TextField
+            label="Day of month"
+            type="number"
+            size='medium'
+            variant='standard'
+            value={ settings?.primePodDaily?.dayOfMonth ?? 1 }
+            onChange={ (e) => {
+              const clamped = Math.min(28, Math.max(1, Number(e.target.value) || 1));
+              updateSettings({ primePodDaily: { dayOfMonth: clamped } });
+            } }
+            disabled={ isUpdating || settings?.primePodDaily?.enabled === false }
+            slotProps={ { htmlInput: { min: 1, max: 28 } } }
+            sx={ { width: '110px' } }
+          />
+        ) }
       </Box>
     </>
 

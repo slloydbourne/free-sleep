@@ -162,6 +162,35 @@ def insert_sleep_records(sleep_records: List[SleepRecord]):
 
 
 
+def insert_sleep_stages(side: str, stages_df: pd.DataFrame):
+    """
+    Inserts (side, timestamp, stage) rows into the sleep_stages table.
+    Uses REPLACE (not IGNORE) so re-running classification for the same window
+    updates prior results - useful while the crude classifier's thresholds are
+    still being calibrated against real data.
+    """
+    try:
+        cursor = conn.cursor()
+        if stages_df.empty:
+            logger.warning('No sleep stages to insert, exiting...')
+            return
+
+        insert_query = """
+        INSERT OR REPLACE INTO sleep_stages (side, timestamp, stage)
+        VALUES (?, ?, ?);
+        """
+        values_to_insert = [
+            (side, int(row.timestamp), row.stage)
+            for row in stages_df.itertuples()
+        ]
+        cursor.executemany(insert_query, values_to_insert)
+        logger.info(f"Inserted {len(values_to_insert)} sleep stage record(s) into 'sleep_stages'.")
+    except Exception as error:
+        logger.error(error)
+    finally:
+        cursor.close()
+
+
 def insert_movement_df(movement_df: pd.DataFrame):
     try:
         logger.debug(f'Inserting {movement_df.shape[0]} rows into movement table...')

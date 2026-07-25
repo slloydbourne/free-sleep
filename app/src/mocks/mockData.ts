@@ -202,6 +202,7 @@ const createSettings = (): Settings => ({
   left: {
     name: 'Left side',
     awayMode: false,
+    sleepStageTemperatures: { enabled: false, awake: 85, light: 82, deep: 78, rem: 82 },
     scheduleOverrides: {
       temperatureSchedules: { disabled: false, expiresAt: '' },
       alarm: { disabled: false, timeOverride: '', expiresAt: '' },
@@ -228,6 +229,7 @@ const createSettings = (): Settings => ({
   right: {
     name: 'Right side',
     awayMode: false,
+    sleepStageTemperatures: { enabled: false, awake: 85, light: 82, deep: 78, rem: 82 },
     scheduleOverrides: {
       temperatureSchedules: { disabled: false, expiresAt: '' },
       alarm: { disabled: false, timeOverride: '', expiresAt: '' },
@@ -251,7 +253,7 @@ const createSettings = (): Settings => ({
       },
     }
   },
-  primePodDaily: { enabled: true, time: '14:30' },
+  primePodDaily: { enabled: true, time: '14:30', frequency: 'daily', dayOfMonth: 1 },
 });
 
 const createServices = (): Services => ({
@@ -412,6 +414,12 @@ const createServerStatus = (): ServerStatus => ({
     name: 'Temperature schedule',
     status: 'healthy',
     description: 'Temperature automation',
+    message: '',
+  },
+  sleepStageTemperatureSchedule: {
+    name: 'Sleep stage temperature schedule',
+    status: 'healthy',
+    description: 'Adjusts temperature based on crude sleep stage detection',
     message: '',
   },
   analyzeSleepLeft: {

@@ -86,6 +86,12 @@ class ServerStatus {
         description: 'Temperature adjustment schedule',
         message: '',
       },
+      sleepStageTemperatureSchedule: {
+        name: 'Sleep stage temperature schedule',
+        status: 'not_started',
+        description: 'Adjusts temperature based on crude sleep stage detection',
+        message: '',
+      },
     };
   }
 

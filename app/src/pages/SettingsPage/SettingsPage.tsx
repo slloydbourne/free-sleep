@@ -16,6 +16,7 @@ import Divider from './Divider.tsx';
 import FeaturesSection from './FeaturesSection/FeaturesSection.tsx';
 import Section from './Section.tsx';
 import DeviceSettingsSection from './DeviceSettingsSection/DeviceSettingsSection.tsx';
+import SleepStageTemperatures from './SleepStageTemperatures.tsx';
 import ErrorBoundary from '@components/ErrorBoundary.tsx';
 
 
@@ -56,6 +57,12 @@ export default function SettingsPage() {
       </ErrorBoundary>
 
       <FeaturesSection/>
+      <ErrorBoundary componentName='Sleep stage temperature settings'>
+        <Section title="Sleep stage temperature (experimental)">
+          <SleepStageTemperatures side="left" settings={ settings } updateSettings={ updateSettings }/>
+          <SleepStageTemperatures side="right" settings={ settings } updateSettings={ updateSettings }/>
+        </Section>
+      </ErrorBoundary>
       <ErrorBoundary componentName='Side settings'>
 
         <Section title="Side settings">

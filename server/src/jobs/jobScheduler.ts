@@ -14,6 +14,7 @@ import { scheduleAlarm, scheduleAlarmOverride } from './alarmScheduler.js';
 import { schedulePowerOffAndSleepAnalysis, schedulePowerOn } from './powerScheduler.js';
 import { schedulePrimingRebootAndCalibration } from './primeScheduler.js';
 import { scheduleTemperatures } from './temperatureScheduler.js';
+import { scheduleSleepStageTemperatures } from './sleepStageTemperatureScheduler.js';
 
 
 async function setupJobs() {
@@ -52,6 +53,7 @@ async function setupJobs() {
       });
     });
     schedulePrimingRebootAndCalibration(settingsData);
+    scheduleSleepStageTemperatures(settingsData);
 
     logger.info('Done scheduling jobs!');
     serverStatus.status.alarmSchedule.status = 'healthy';
@@ -60,6 +62,7 @@ async function setupJobs() {
     serverStatus.status.powerSchedule.status = 'healthy';
     serverStatus.status.rebootSchedule.status = 'healthy';
     serverStatus.status.temperatureSchedule.status = 'healthy';
+    serverStatus.status.sleepStageTemperatureSchedule.status = 'healthy';
   } catch (error: unknown) {
     serverStatus.status.jobs.status = 'failed';
     const message = error instanceof Error ? error.message : String(error);

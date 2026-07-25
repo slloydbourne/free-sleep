@@ -27,3 +27,10 @@ export interface MovementRecord {
   total_movement: number;
 }
 
+export interface SleepStageRecord {
+  id: number;
+  side: Side;
+  timestamp: string;
+  stage: 'awake' | 'light' | 'deep' | 'rem';
+}
+
