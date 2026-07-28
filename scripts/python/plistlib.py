@@ -58,7 +58,17 @@ import itertools
 import os
 import re
 import struct
-from xml.parsers.expat import ParserCreate
+try:
+    from xml.parsers.expat import ParserCreate
+except ImportError:
+    # pyexpat can be unavailable/broken on some embedded builds (e.g. a glibc
+    # mismatch on Pod 3 SD-card firmware). Only XML-format plist parsing needs
+    # it - binary-format plists and everything that merely imports this module
+    # (like pkg_resources' unconditional macOS-detection import) still work.
+    def ParserCreate(*args, **kwargs):
+        raise ImportError(
+            "xml.parsers.expat (pyexpat) is unavailable - XML plist support is disabled"
+        )
 
 
 PlistFormat = enum.Enum('PlistFormat', 'FMT_XML FMT_BINARY', module=__name__)
