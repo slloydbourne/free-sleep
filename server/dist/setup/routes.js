@@ -1,5 +1,3 @@
-
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ca07c08e-ac96-5992-9ca4-451a00415d21")}catch(e){}}();
 import * as Sentry from '@sentry/node';
 import express from 'express';
 import path from 'path';
@@ -15,6 +13,7 @@ import sleep from '../routes/metrics/sleep.js';
 import movement from '../routes/metrics/movement.js';
 import vitals from '../routes/metrics/vitals.js';
 import presence from '../routes/metrics/presence.js';
+import sleepStages from '../routes/metrics/sleepStages.js';
 import logs from '../routes/logs/logs.js';
 import serverStatus from '../routes/serverStatus/serverStatus.js';
 import logger from '../logger.js';
@@ -33,6 +32,7 @@ export default function (app) {
     app.use('/api/metrics/', sleep);
     app.use('/api/metrics/', vitals);
     app.use('/api/metrics/', presence);
+    app.use('/api/metrics/', sleepStages);
     app.use('/api/logs', logs);
     app.use('/api/serverStatus', serverStatus);
     app.use('/api', (req, res) => {
@@ -67,4 +67,3 @@ export default function (app) {
     logger.debug('Registered routes!');
 }
 //# sourceMappingURL=routes.js.map
-//# debugId=ca07c08e-ac96-5992-9ca4-451a00415d21

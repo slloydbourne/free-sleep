@@ -1,10 +1,10 @@
-
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="f7c415b0-2bec-56be-b72d-bb0b23135cc1")}catch(e){}}();
 import { z } from 'zod';
 import { TIME_ZONES } from './timeZones.js';
-import { TimeSchema } from './schedulesSchema.js';
+import { TemperatureSchema, TimeSchema } from './schedulesSchema.js';
 export const TEMPERATURES = ['celsius', 'fahrenheit'];
 const Temperatures = z.enum(TEMPERATURES);
+export const PRIME_FREQUENCIES = ['daily', 'monthly'];
+const PrimeFrequency = z.enum(PRIME_FREQUENCIES);
 const TemperatureTapConfig = z.object({
     type: z.literal('temperature'),
     change: z.enum(['increment', 'decrement']),
@@ -21,9 +21,20 @@ export const TapConfig = z.discriminatedUnion('type', [
     AlarmTapConfig,
 ]);
 export const GestureSchema = z.enum(['doubleTap', 'tripleTap', 'quadTap']);
+// Crude, first-pass sleep-stage temperature control - see
+// biometrics/sleep_detection/stage_classifier.py for how stages are detected.
+// One target temperature per stage; applied live while enabled.
+const SleepStageTemperaturesSchema = z.object({
+    enabled: z.boolean(),
+    awake: TemperatureSchema,
+    light: TemperatureSchema,
+    deep: TemperatureSchema,
+    rem: TemperatureSchema,
+}).strict();
 const SideSettingsSchema = z.object({
     name: z.string().min(1).max(20),
     awayMode: z.boolean(),
+    sleepStageTemperatures: SleepStageTemperaturesSchema,
     scheduleOverrides: z.object({
         temperatureSchedules: z.object({
             disabled: z.boolean(),
@@ -49,9 +60,11 @@ export const SettingsSchema = z.object({
     primePodDaily: z.object({
         enabled: z.boolean(),
         time: TimeSchema,
+        frequency: PrimeFrequency,
+        // Capped at 28 so it fires reliably in every month, including February
+        dayOfMonth: z.number().int().min(1).max(28),
     }),
     temperatureFormat: Temperatures,
     rebootDaily: z.boolean(),
 }).strict();
 //# sourceMappingURL=settingsSchema.js.map
-//# debugId=f7c415b0-2bec-56be-b72d-bb0b23135cc1

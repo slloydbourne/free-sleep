@@ -1,5 +1,3 @@
-
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="06057641-4ecd-5809-98b7-74a1353640a9")}catch(e){}}();
 import path from 'path';
 import chokidar from 'chokidar';
 import moment from 'moment-timezone';
@@ -14,6 +12,7 @@ import { scheduleAlarm, scheduleAlarmOverride } from './alarmScheduler.js';
 import { schedulePowerOffAndSleepAnalysis, schedulePowerOn } from './powerScheduler.js';
 import { schedulePrimingRebootAndCalibration } from './primeScheduler.js';
 import { scheduleTemperatures } from './temperatureScheduler.js';
+import { scheduleSleepStageTemperatures } from './sleepStageTemperatureScheduler.js';
 async function setupJobs() {
     try {
         if (serverStatus.status.jobs.status === 'started') {
@@ -44,6 +43,7 @@ async function setupJobs() {
             });
         });
         schedulePrimingRebootAndCalibration(settingsData);
+        scheduleSleepStageTemperatures(settingsData);
         logger.info('Done scheduling jobs!');
         serverStatus.status.alarmSchedule.status = 'healthy';
         serverStatus.status.jobs.status = 'healthy';
@@ -51,6 +51,7 @@ async function setupJobs() {
         serverStatus.status.powerSchedule.status = 'healthy';
         serverStatus.status.rebootSchedule.status = 'healthy';
         serverStatus.status.temperatureSchedule.status = 'healthy';
+        serverStatus.status.sleepStageTemperatureSchedule.status = 'healthy';
     }
     catch (error) {
         serverStatus.status.jobs.status = 'failed';
@@ -102,4 +103,3 @@ chokidar.watch(config.lowDbFolder).on('change', (changedPath) => {
 // Initial job setup
 waitForValidDateAndSetupJobs();
 //# sourceMappingURL=jobScheduler.js.map
-//# debugId=06057641-4ecd-5809-98b7-74a1353640a9

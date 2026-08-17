@@ -1,9 +1,8 @@
-
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c47fea5f-3fdb-5d34-b9c3-a971bf6baffc")}catch(e){}}();
 import schedule from 'node-schedule';
 import { updateDeviceStatus } from '../routes/deviceStatus/updateDeviceStatus.js';
 import { getDayIndexForSchedule, getDayOfWeekIndex, logJob } from './utils.js';
 import { executeAnalyzeSleep } from './analyzeSleep.js';
+import { executeClassifyStages } from './classifyStages.js';
 import moment from 'moment-timezone';
 import serverStatus from '../serverStatus.js';
 import logger from '../logger.js';
@@ -74,7 +73,13 @@ const scheduleAnalyzeSleep = (dayOfWeekIndex, offHour, offMinute, timeZone, side
         await memoryDB.write();
         logJob('Executing daily sleep analyzer job', side, day, dayOfWeekIndex, time);
         // Subtract a fixed start time
-        executeAnalyzeSleep(side, moment().subtract(12, 'hours').toISOString(), moment().add(1, 'hours').toISOString());
+        const stageWindowStart = moment().subtract(12, 'hours').toISOString();
+        const stageWindowEnd = moment().add(1, 'hours').toISOString();
+        // Stage classification reads the movement data analyzeSleep computes, so it
+        // must wait for analyzeSleep to actually finish, not just be spawned
+        await executeAnalyzeSleep(side, stageWindowStart, stageWindowEnd);
+        // Crude first-pass heuristic, see stage_classifier.py for caveats
+        executeClassifyStages(side, stageWindowStart, stageWindowEnd);
     });
 };
 export const schedulePowerOffAndSleepAnalysis = (settingsData, side, day, power) => {
@@ -114,4 +119,3 @@ export const schedulePowerOffAndSleepAnalysis = (settingsData, side, day, power)
     });
 };
 //# sourceMappingURL=powerScheduler.js.map
-//# debugId=c47fea5f-3fdb-5d34-b9c3-a971bf6baffc

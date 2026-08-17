@@ -1,5 +1,3 @@
-
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="f87d278a-9345-5986-93c0-6b6e1923886e")}catch(e){}}();
 import schedule from 'node-schedule';
 import logger from '../logger.js';
 import { updateDeviceStatus } from '../routes/deviceStatus/updateDeviceStatus.js';
@@ -60,16 +58,21 @@ export const schedulePrimingRebootAndCalibration = (settingsData) => {
     if (!primePodDaily.enabled)
         return;
     const dailyRule = new schedule.RecurrenceRule();
-    const { time } = primePodDaily;
+    const { time, frequency, dayOfMonth } = primePodDaily;
     const [onHour, onMinute] = time.split(':').map(Number);
     dailyRule.hour = onHour;
     dailyRule.minute = onMinute;
     dailyRule.tz = timeZone;
+    // Priming itself can be throttled to monthly; reboot/calibration stay daily
+    // since they're sensor/system maintenance, not tied to the water pump cycle.
+    if (frequency === 'monthly') {
+        dailyRule.date = dayOfMonth;
+    }
     scheduleRebootJob(onHour - 1, onMinute, timeZone);
     scheduleCalibrationJob(onHour, 0, timeZone, 'left');
     scheduleCalibrationJob(onHour, 30, timeZone, 'right');
-    logger.debug(`Scheduling daily prime job at ${primePodDaily.time}`);
-    schedule.scheduleJob(`daily-priming-${time}`, dailyRule, async () => {
+    logger.debug(`Scheduling ${frequency} prime job at ${primePodDaily.time}`);
+    schedule.scheduleJob(`${frequency}-priming-${time}`, dailyRule, async () => {
         try {
             logger.info(`Executing scheduled prime job`);
             await updateDeviceStatus({ isPriming: true });
@@ -85,4 +88,3 @@ export const schedulePrimingRebootAndCalibration = (settingsData) => {
     });
 };
 //# sourceMappingURL=primeScheduler.js.map
-//# debugId=f87d278a-9345-5986-93c0-6b6e1923886e

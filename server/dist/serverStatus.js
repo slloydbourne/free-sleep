@@ -1,5 +1,3 @@
-
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="5a9bbe68-2e7d-5573-9d4a-b88e302bc698")}catch(e){}}();
 import { isSystemDateValid } from './jobs/isSystemDateValid.js';
 import servicesDB from './db/services.js';
 import { prisma } from './db/prisma.js';
@@ -83,6 +81,12 @@ class ServerStatus {
                 description: 'Temperature adjustment schedule',
                 message: '',
             },
+            sleepStageTemperatureSchedule: {
+                name: 'Sleep stage temperature schedule',
+                status: 'not_started',
+                description: 'Adjusts temperature based on crude sleep stage detection',
+                message: '',
+            },
         };
     }
     static getInstance() {
@@ -156,4 +160,3 @@ class ServerStatus {
 }
 export default ServerStatus.getInstance();
 //# sourceMappingURL=serverStatus.js.map
-//# debugId=5a9bbe68-2e7d-5573-9d4a-b88e302bc698

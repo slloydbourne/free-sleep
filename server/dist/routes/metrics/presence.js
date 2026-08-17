@@ -1,5 +1,3 @@
-
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:{},n=(new e.Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="b18ec96d-ee43-5c4f-b78e-940ae1fbafa1")}catch(e){}}();
 import express from 'express';
 import moment from 'moment-timezone';
 import { z } from 'zod';
@@ -77,6 +75,7 @@ router.post('/presence', async (req, res) => {
 router.get('/presence', (req, res) => {
     return res.status(200).json(presenceData);
 });
+// Lets other server code (e.g. jobs) read live presence without an HTTP round-trip
+export const getPresence = (side) => presenceData[side];
 export default router;
 //# sourceMappingURL=presence.js.map
-//# debugId=b18ec96d-ee43-5c4f-b78e-940ae1fbafa1
