@@ -26,7 +26,11 @@ export const executePythonScript = async ({ script, args = [] }: ExecutePythonSc
   logger.info(`Executing: ${command}`);
 
   return new Promise<void>((resolve) => {
-    exec(command, { env: { ...process.env } }, (error, stdout, stderr) => {
+    // Sensor-array debug logging can produce well over Node's default 1MB
+    // stdout/stderr cap on a real overnight window, which silently kills the
+    // process before it can update job status - raise it well above anything
+    // this script realistically prints.
+    exec(command, { env: { ...process.env }, maxBuffer: 64 * 1024 * 1024 }, (error, stdout, stderr) => {
       if (error) {
         logger.error(`Execution error: ${error.message}`);
         resolve();
